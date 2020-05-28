@@ -1,9 +1,9 @@
-@extends('layout/master_login')
+@extends('layout/master')
 
 @section('title',$title)
 
 @section('content')
-<section class="container-fluid" id="show">
+<section class="container-fluid" id="register_section">
     <div class="row mx-auto">
         <div class="col-lg-7 mx-auto py-3">
             <form method="POST" id="register" class="bg-light rounded border border-dark mx-auto p-3">
@@ -34,23 +34,16 @@
                     <input type="password" class="form-control" id="c_password" name="c_password" placeholder="確認密碼">
                 </div>
 
-                <div class="form-group">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="type" id="type01" value="0" checked>
-                        <label class="form-check-label" for="type01">一般會員</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="type" id="type02" value="1">
-                        <label class="form-check-label" for="type02">管理者</label>
-                    </div>
-                </div>
-
                 <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">送出</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">註冊</button>
                 </div>
                 @include('layout.validationErrorMessag')
             </form>
         </div>
     </div>
 </section>
+@endsection
+
+@section('javascript')
+<script src="{{asset('js/login.js')}}"></script>
 @endsection

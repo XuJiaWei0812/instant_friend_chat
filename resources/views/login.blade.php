@@ -1,16 +1,15 @@
-@extends('layout/master_login')
+@extends('layout/master')
 
 @section('title',$title)
 
 @section('content')
-<section class="container-fluid" id="show">
-    <div class="row mx-auto">
-        <div class="col-lg-7 mx-auto py-3">
+<section class="container-fluid" id="login_section">
+    <div class="row">
+        <div class="col-lg-5 m-auto py-3">
             <form method="POST" id="login" class="bg-light rounded border border-dark mx-auto p-3">
                 <div class="form-group">
                     <h1 class="text-center">{{$title}}</h1>
                 </div>
-                <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp"
@@ -24,11 +23,18 @@
                 </div>
 
                 <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">送出</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">登入</button>
+                    <small id="emailHelp" class="form-text text-muted text-center pt-3">
+                        還不是會員?<a href="/register">加入會員</a>
+                    </small>
                 </div>
                 @include('layout.validationErrorMessag')
             </form>
         </div>
     </div>
 </section>
+@endsection
+
+@section('javascript')
+<script src="{{asset('js/login.js')}}"></script>
 @endsection

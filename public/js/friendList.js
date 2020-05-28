@@ -1,20 +1,13 @@
 $(function () {
     $.ajaxSetup({
         headers: {
-            'Accept': 'application/json',
+            // 'Accept': 'application/json',
+            // 'Authorization': "Bearer " + $('meta[name="laravel_token"]').attr('content'),
+            // 'XSRF-TOKEN': $('meta[name="XSRF-TOKEN"]').attr('content'),
             'Authorization': "Bearer " + localStorage.getItem('token'),
+            'X-Requested-With': 'XMLHttpRequest',
         }
     });
-
-    if (localStorage.getItem("token") != null) {
-        $('#nav-li').append('<li class="nav-item">' +
-            '<a href="#" class="nav-link text-light " id="logout">登出</a>' +
-            '</li>');
-    } else {
-        $('#nav-li').append('<li class="nav-item">' +
-            '<a class= "nav-link text-light" href="/login">登陸</a>' +
-            '</li>');
-    }
 
     $("#logout").click(function (event) {
         event.preventDefault();
@@ -26,13 +19,10 @@ $(function () {
             type: "GET",
             url: "/api/logout",
             dataType: "json",
-            contentType: false,
-            cache: false,
-            processData: false,
             success: function (data) {
                 if ($.isEmptyObject(data.error)) {
                     alert(data.success);
-                    window.location.replace("/login");
+                    window.location.replace("/");
                     localStorage.removeItem('token');
                 }
             }

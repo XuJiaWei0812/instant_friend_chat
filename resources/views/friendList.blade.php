@@ -1,4 +1,4 @@
-@extends('layout/master_login')
+@extends('layout/master')
 
 @section('title',$title)
 
@@ -10,4 +10,8 @@
         </div>
     </div>
 </section>
+@endsection
+
+@section('javascript')
+<script src="{{asset('js/friendList.js')}}"></script>
 @endsection

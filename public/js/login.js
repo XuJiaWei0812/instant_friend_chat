@@ -1,8 +1,7 @@
 $(function () {
     $.ajaxSetup({
         headers: {
-            'Accept': 'application/json',
-            'Authorization': "Bearer " + localStorage.getItem('token'),
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
         }
     });
 
@@ -23,28 +22,10 @@ $(function () {
         logout()
     });
 
-    function logout() {
-        $.ajax({
-            type: "GET",
-            url: "/api/logout",
-            dataType: "json",
-            contentType: false,
-            cache: false,
-            processData: false,
-            success: function (data) {
-                if ($.isEmptyObject(data.error)) {
-                    alert(data.success);
-                    window.location.replace("/login");
-                    localStorage.removeItem('token');
-                }
-            }
-        });
-    }
-
     function login(formData) {
         $.ajax({
-            type: "POST",
-            url: "/login",
+            type: "post",
+            url: "/api/login",
             dataType: "json",
             data: formData,
             contentType: false,
@@ -53,7 +34,7 @@ $(function () {
             success: function (data) {
                 if ($.isEmptyObject(data.error)) {
                     alert(data.success.message);
-                    window.location.replace("/");
+                    window.location.replace("/friend/roster");
                     localStorage.setItem('token', data.success.token)
                 } else {
                     printErrorMsg(data.error);
@@ -65,7 +46,7 @@ $(function () {
     function register(formData) {
         $.ajax({
             type: "POST",
-            url: "/register",
+            url: "/api/register",
             dataType: "json",
             data: formData,
             contentType: false,
@@ -74,7 +55,7 @@ $(function () {
             success: function (data) {
                 if ($.isEmptyObject(data.error)) {
                     alert(data.success);
-                    window.location.replace("/login");
+                    window.location.replace("/");
                 } else {
                     printErrorMsg(data.error);
                 }
