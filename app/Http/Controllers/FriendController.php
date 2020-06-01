@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Validator;
+use Illuminate\Support\Facades\Auth;
 use App\user;
 use App\friend;
+use Session;
 
 class FriendController extends Controller
 {
@@ -24,21 +26,28 @@ class FriendController extends Controller
             $user=User::where('email', $input['email'])->first();
 
             if (empty($user)) {
-                return response()->json(['error' => '查無此會員帳號']);
-            } elseif (!empty($user) && $user->id==1) {
-                return response()->json(['error'=> '請勿輸入自己的帳號']);
+                return response()->json(['error' => ['查無此會員帳號']]);
+            } elseif (!empty($user) && $user->id==auth('api')->user()->id) {
+                return response()->json(['error'=> ['請勿輸入自己的帳號']]);
             } else {
-                $friend=Friend::where('invitee_user_id', $user->id)->where('inviter_user_id', 1)->first();
+                $friend=Friend::Where(function ($query) {
+                    $query->where('inviter_user_id', '=', auth('api')->user()->id)
+                    ->orWhere('invitee_user_id', '=', auth('api')->user()->id);
+                })->Where(function ($query) use ($user) {
+                    $query->where('inviter_user_id', '=', $user->id)
+                    ->orWhere('invitee_user_id', '=', $user->id);
+                })->first();
+
                 if (!empty($friend)) {
                     if ($friend->type==0) {
-                        return response()->json(['error' => '等待對方同意']);
+                        return response()->json(['error' => ['等待對方同意']]);
                     } else {
-                        return response()->json(['error' => '已與對方為朋友']);
+                        return response()->json(['error' => ['已與對方為朋友']]);
                     }
                 }
             }
             $data=[
-                    'inviter_user_id' => 1,
+                    'inviter_user_id' => auth('api')->user()->id,
                     'invitee_user_id' => $user->id,
                 ];
             $friend = Friend::create($data);
@@ -47,7 +56,7 @@ class FriendController extends Controller
     }
     public function agreeApplyProcess($friend_id)
     {
-        $friend=Friend::where('id', $friend_id)->first();
+        $friend=Friend::where('id', $friend_id)->where('invitee_user_id', auth('api')->user()->id)->first();
         if (empty($friend)) {
             return response()->json(['error' => '並無此好友申請']);
         } else {
@@ -57,7 +66,8 @@ class FriendController extends Controller
     }
     public function refuseApplyProcess($friend_id)
     {
-        $friend=Friend::where('id', $friend_id)->first();
+        $friend=Friend::where('id', $friend_id)->where('invitee_user_id', auth('api')->user()->id)->first();
+
         if (empty($friend)) {
             return response()->json(['error' => '並無此好友申請']);
         } else {
@@ -73,6 +83,20 @@ class FriendController extends Controller
         } else {
             Friend::where('id', $friend_id)->delete();
             return response()->json(['success' => '成功刪除此好友']);
+        }
+    }
+    public function friendCreateMessageProcess(Request $request, $fid)
+    {
+        $input = request()->all();
+
+        $validator = Validator::make($request->all(), [
+            'message' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->all()]);
+        } else {
+            event(new \App\Events\createFriendMessage($fid, auth('api')->user()->id, $input));
         }
     }
 }

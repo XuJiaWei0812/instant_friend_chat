@@ -25,29 +25,28 @@ class PageController extends Controller
     }
     public function friendRosterPage()
     {
-        $row_per_page = 10;
-
-        $friendRosterPaginate = DB::table('friends')
+        $friendRosters = DB::table('friends')
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'friends.inviter_user_id')
                     ->orOn('users.id', '=', 'friends.invitee_user_id');
             })
-            ->select('friends.id as fid', 'users.id as inviter_id', 'name as inviter_name', 'email as inviter_email', 'online')
+            ->select('friends.id as fid', 'users.id as fu_id', 'name as fu_name', 'email as fu_email', 'photo', 'online')
             ->where('friends.type', '=', 1)
-            ->where('users.id', '<>', 1)
+            ->where('users.id', '<>', auth('web')->user()->id)
             ->Where(function ($query) {
-                $query->where('inviter_user_id', 1)
-                    ->orWhere('invitee_user_id', 1);
+                $query->where('inviter_user_id', auth('web')->user()->id)
+                    ->orWhere('invitee_user_id', auth('web')->user()->id);
             })
-            ->paginate($row_per_page);
+            ->get();
 
         $binding = [
             'title' => '好友名單',
-            // 'friendRosterPaginate' => $friendRosterPaginate,
+            'name'=>auth('web')->user()->name,
+            'photo'=>auth('web')->user()->photo,
+            'friendRosters' => $friendRosters,
         ];
 
-         return view('friendList', $binding);
-
+        return view('friend.friendList', $binding);
     }
     public function friendRecordPage()
     {
@@ -62,7 +61,7 @@ class PageController extends Controller
             from friends_message group by friend_id) c where friends_message.created_at=c.maxtime) as friends_message'), function ($join) {
                 $join->on('friends_message.friend_id', '=', 'friends.id');
             })
-            ->select('friends.id as fid','name','photo','message','unread','maxtime')
+            ->select('friends.id as fid', 'name', 'photo', 'message', 'unread', 'maxtime')
             ->where('users.id', '<>', 1)
             ->Where(function ($query) {
                 $query->where('inviter_user_id', 1)
@@ -73,6 +72,8 @@ class PageController extends Controller
 
         $binding = [
             'title' => '聊天紀錄',
+            'name'=>auth('web')->user()->name,
+            'photo'=>auth('web')->user()->photo,
             'friendRecords' => $friendRecords,
         ];
 
@@ -85,17 +86,91 @@ class PageController extends Controller
                 $join->on('users.id', '=', 'friends.inviter_user_id')
                     ->orOn('users.id', '=', 'friends.invitee_user_id');
             })
-            ->select('friends.id as fid', 'users.id as inviter_id', 'name as inviter_name', 'email as inviter_email')
-            ->where('invitee_user_id', 1)
-            ->where('users.id', '!=', 1)
+            ->select('friends.id as fid', 'users.id as fu_id', 'name as fu_name', 'email as fu_email')
+            ->where('invitee_user_id', auth('web')->user()->id)
+            ->where('users.id', '!=', auth('web')->user()->id)
             ->where('friends.type', 0)
             ->get();
 
         $binding = [
             'title' => '申請審核',
+            'name'=>auth('web')->user()->name,
+             'photo'=>auth('web')->user()->photo,
             'friendApplys' => $friendApplys,
         ];
 
-        return response()->json(['success' => $friendApplyPage]);
+        return view('friend.friendList', $binding);
+    }
+    public function friendMessagePage($fid)
+    {
+        $friend = DB::table('friends')
+            ->join('users', function ($join) {
+                $join->on('users.id', '=', 'friends.inviter_user_id')
+                    ->orOn('users.id', '=', 'friends.invitee_user_id');
+            })
+            ->select('users.id as fuid', 'users.name as fu_name', 'photo as fu_photo')
+            ->where('users.id', '!=', auth('web')->user()->id)
+            ->where('friends.id', $fid)
+            ->Where(function ($query) {
+                $query->where('inviter_user_id', auth('web')->user()->id)
+                    ->orWhere('invitee_user_id', auth('web')->user()->id);
+            })
+            ->first();
+        if ($friend === null) {
+            return response('404 Not Found', 404);
+        } else {
+            $friendMessages = DB::table('friends_message')
+                ->join('users', function ($join) {
+                    $join->on('users.id', '=', 'friends_message.user_id');
+                })
+                ->select(
+                    'users.id as uid',
+                    'name',
+                    'photo',
+                    'message',
+                    DB::raw("DATE_FORMAT(friends_message.created_at,'%Y-%m-%d') as date"),
+                    DB::raw("DATE_FORMAT(friends_message.created_at,'%H:%i') as time"),
+                    'friends_message.created_at',
+                    'friends_message.type as ready'
+                )
+                ->where('friends_message.friend_id', $fid)
+                ->orderBy('friends_message.created_at', 'asc')
+                ->get();
+            $date = "";
+            foreach ($friendMessages as &$friendMessage) {
+                $friendMessage->photo = asset($friendMessage->photo);
+
+                if ($friendMessage->ready == '1') {
+                    $friendMessage->ready = "已讀";
+                } else {
+                    $friendMessage->ready = "";
+                }
+
+                if (strpos($friendMessage->message, 'images') !== false) {
+                    $friendMessage->message = asset($friendMessage->message);
+                }
+
+                if ($date != $friendMessage->date) {
+                    $date = $friendMessage->date;
+                    if ($date == date("Y-m-d")) {
+                        $friendMessage->date = "今天";
+                    }
+                } else {
+                    $friendMessage->date = "";
+                }
+            }
+            unset($friendMessage);
+
+            $binding = [
+                'title' => $friend->fu_name,
+                'name'=>auth('web')->user()->name,
+                'photo'=>auth('web')->user()->photo,
+                'fu_name'=>$friend->fu_name,
+                'fu_photo'=>$friend->fu_photo,
+                'friendMessages' => $friendMessages,
+            ];
+
+            return view('friend.friendMessage', $binding);
+        }
     }
 }

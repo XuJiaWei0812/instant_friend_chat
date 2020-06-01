@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -22,7 +21,5 @@ Route::group(['prefix' => 'friend'], function () {
     Route::put('/apply/{friend_id}', 'FriendController@agreeApplyProcess');
     Route::delete('/apply/{friend_id}', 'FriendController@refuseApplyProcess');
 
-    Route::post('/chat/{friend_id}', function () {
-        return '好友聊天api';
-    });
+    Route::post('/chat/{friend_id}', 'FriendController@friendCreateMessageProcess');
 });

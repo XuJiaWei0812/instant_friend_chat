@@ -38,6 +38,8 @@ class PassportController extends Controller
     {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $user = Auth::user();
+            $user->online=1;
+            $user->save();
             $success['token'] =  $user->createToken('token')->accessToken;
             $success['message']=$user->name." 登入成功 ";
             return response()->json(['success' => $success]);
@@ -48,6 +50,9 @@ class PassportController extends Controller
     public function logout(Request $request)
     {
         if (Auth::check()) {
+            $user = Auth::user();
+            $user->online=0;
+            $user->save();
             Auth::user()->AauthAcessToken()->delete();
             Auth::guard('web')->logout();
             return response()->json(['success' => '成功登出']);

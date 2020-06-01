@@ -36,5 +36,5 @@
 @endsection
 
 @section('javascript')
-<script src="{{asset('js/login.js')}}"></script>
+<script src="{{asset('js/user.js')}}"></script>
 @endsection

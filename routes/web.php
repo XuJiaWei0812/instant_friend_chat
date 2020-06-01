@@ -11,7 +11,5 @@ Route::group(['prefix' => 'friend'], function () {
     Route::get('/roster', 'PageController@friendRosterPage');
     Route::get('/record', 'PageController@friendRecordPage');
     Route::get('/apply', 'PageController@friendApplyPage');
-    Route::get('/chat/{friedn_id}', function () {
-        return '跟XXX聊天';
-    });
+    Route::get('/chat/{friedn_id}', 'PageController@friendMessagePage');
 });

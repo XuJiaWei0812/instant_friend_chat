@@ -12,11 +12,13 @@
     <title>@yield('title')</title>
 </head>
 
-<body>
-
-    {{-- @if (Auth::check()) --}}
+<body class="bg-dark">
+    @if (Auth::check())
     <header class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <span class="navbar-brand" href="#">@yield('title')</span>
+        <div class="navbar-brand">
+            <img src="{{asset($photo)}}" class="rounded-circle mr-2" width="48px" height="48px" alt="圖片無法顯示">
+            <span>{{$name}}</span>
+        </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -25,28 +27,34 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto" id="nav-li">
                 <li class="nav-item">
-                    <a class="nav-link text-light" href="/">好友名單</a>
+                    <a class="nav-link text-light" href="/friend/roster">好友名單</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-light" href="/">聊天紀錄</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-light" href="/">申請審核</a>
+                    <a class="nav-link text-light" href="/friend/apply">申請審核</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto" id="nav-li">
+                <li class="nav-item">
+                    <button type="button" class="ml-3 btn btn-success" data-toggle="modal" data-target="#exampleModal">
+                        添加好友
+                    </button>
+                </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link text-light " id="logout">登出</a>
                 </li>
             </ul>
         </div>
     </header>
-    {{-- @endif --}}
+    @include('friend.createFriendModal')
+    @endif
 
     @yield('content')
 
-    <script src="{{asset('js/jquery-3.4.1.min.js')}}"></script>
-    <script src="{{asset('bootstrap/js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/jquery-3.4.1.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('bootstrap/js/bootstrap.min.js')}}"></script>
     @yield('javascript')
 </body>
 
