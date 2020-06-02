@@ -14,7 +14,7 @@
 
 <body class="bg-dark">
     @if (Auth::check())
-    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="navbar-brand">
             <img src="{{asset($photo)}}" class="rounded-circle mr-2" width="48px" height="48px" alt="圖片無法顯示">
             <span>{{$name}}</span>

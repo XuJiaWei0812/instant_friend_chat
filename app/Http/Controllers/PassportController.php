@@ -41,6 +41,7 @@ class PassportController extends Controller
             $user->online=1;
             $user->save();
             $success['token'] =  $user->createToken('token')->accessToken;
+            $success['uid']=$user->id;
             $success['message']=$user->name." 登入成功 ";
             return response()->json(['success' => $success]);
         } else {

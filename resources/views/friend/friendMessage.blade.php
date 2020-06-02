@@ -3,7 +3,7 @@
 @section('title',$title)
 
 @section('content')
-<section class="container-fluid" id="show">
+<section class="container-fluid" id="message_section">
     <div class="row mx-auto">
         <div class="col-8 mx-auto text-center text-light">
             <h5>與 {{$fu_name}} 對話中</h5>

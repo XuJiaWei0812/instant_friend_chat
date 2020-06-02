@@ -6,7 +6,7 @@ html {
     font-family: Noto Sans TC;
     word-wrap: break-word;
     flex-direction: column;
-    overflow: inherit;
+    overflow: auto;
 }
 body {
     /* background-image: url(background.jpg); */
@@ -17,6 +17,12 @@ body {
 }
 * {
     font-family: "Noto Sans TC", sans-serif;
+}
+section {
+    padding-top: 74px;
+}
+#message_section {
+    padding-bottom: 110px;
 }
 
 #login_section {

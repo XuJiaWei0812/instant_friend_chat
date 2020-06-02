@@ -35,7 +35,8 @@ $(function () {
                 if ($.isEmptyObject(data.error)) {
                     alert(data.success.message);
                     window.location.replace("/friend/roster");
-                    localStorage.setItem('token', data.success.token)
+                    localStorage.setItem('token', data.success.token);
+                    localStorage.setItem('uid', data.success.token);
                 } else {
                     printErrorMsg(data.error);
                 }

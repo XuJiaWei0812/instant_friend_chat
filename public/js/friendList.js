@@ -109,6 +109,7 @@ $(function () {
                     alert(data.success);
                     window.location.replace("/");
                     localStorage.removeItem('token');
+                    localStorage.removeItem('uid');
                 }
             }
         });
