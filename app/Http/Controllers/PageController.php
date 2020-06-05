@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\FriendMessage;
+use Cache;
+use Illuminate\Support\Facades\Artisan;
+
 
 class PageController extends Controller
 {
@@ -12,7 +16,6 @@ class PageController extends Controller
         $binding = [
             'title' => '登入會員',
         ];
-
         return view('login', $binding);
     }
     public function registerPage()
@@ -43,6 +46,7 @@ class PageController extends Controller
             'title' => '好友名單',
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
+            'id'=>auth('web')->user()->id,
             'friendRosters' => $friendRosters,
         ];
 
@@ -57,27 +61,58 @@ class PageController extends Controller
             })
             ->join(DB::raw('(select * from friends_message,
             (select max(created_at) as maxtime,
-            count(IF(type = 0 AND user_id != 1,true,null)) as unread
+            count(IF(type = 0 AND user_id != '.auth('web')->user()->id.',true,null)) as unread
             from friends_message group by friend_id) c where friends_message.created_at=c.maxtime) as friends_message'), function ($join) {
                 $join->on('friends_message.friend_id', '=', 'friends.id');
             })
-            ->select('friends.id as fid', 'name', 'photo', 'message', 'unread', 'maxtime')
-            ->where('users.id', '<>', 1)
+            ->select(
+                'friends.id as fid',
+                'friends_message.user_id as fm_uid',
+                'users.id as uid',
+                'name',
+                'photo',
+                'message',
+                'unread',
+                DB::raw("DATE_FORMAT(maxtime,'%m-%d') as date"),
+                DB::raw("DATE_FORMAT(maxtime,'%H:%i') as time"),
+            )
+            ->where('users.id', '<>', auth('web')->user()->id)
             ->Where(function ($query) {
-                $query->where('inviter_user_id', 1)
-                    ->orWhere('invitee_user_id', 1);
+                $query->where('inviter_user_id', auth('web')->user()->id)
+                    ->orWhere('invitee_user_id', auth('web')->user()->id);
             })
             ->orderBy('maxtime', 'desc')
             ->get();
+
+        foreach ($friendRecords as &$friendRecord) {
+            if (strpos($friendRecord->message, 'images') !== false) {
+                if ($friendRecord->fm_uid==auth('web')->user()->id) {
+                    $friendRecord->message = "照片已傳送";
+                } else {
+                    $friendRecord->message = $friendRecord->name."傳送了照片";
+                }
+            } else {
+                $friendRecord->message=mb_substr(preg_replace('/<[^>]+>|&[^>]+;/', '', $friendRecord->message), 0, 12, 'utf8');
+            }
+            if (date("m-d")==$friendRecord->date) {
+                $friendRecord->date="";
+            } elseif (date("m-d", strtotime("-1 day"))==$friendRecord->date) {
+                $friendRecord->date="昨天";
+            } else {
+                $friendRecord->time="";
+            }
+        }
+        unset($friendRecord);
 
         $binding = [
             'title' => '聊天紀錄',
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
+            'id'=>auth('web')->user()->id,
             'friendRecords' => $friendRecords,
         ];
 
-        return response()->json(['success' => $friendRecords]);
+        return view('friend.friendList', $binding);
     }
     public function friendApplyPage()
     {
@@ -95,7 +130,8 @@ class PageController extends Controller
         $binding = [
             'title' => '申請審核',
             'name'=>auth('web')->user()->name,
-             'photo'=>auth('web')->user()->photo,
+            'photo'=>auth('web')->user()->photo,
+            'id'=>auth('web')->user()->id,
             'friendApplys' => $friendApplys,
         ];
 
@@ -103,6 +139,14 @@ class PageController extends Controller
     }
     public function friendMessagePage($fid)
     {
+        Artisan::call('view:clear');
+        //進入更改訊息讀取狀態，並使用getReadyMessage、getRecordMessage更改已讀未讀及聊天紀錄
+        FriendMessage::where('friend_id', $fid)
+        ->where('user_id', "!=", auth('web')->user()->id)
+        ->update(['type' => 1]);
+        event(new \App\Events\getReadyMessage($fid));
+        event(new \App\Events\getRecordMessage(auth('web')->user()->id));
+        //取得好友名稱、id、照片
         $friend = DB::table('friends')
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'friends.inviter_user_id')
@@ -119,11 +163,13 @@ class PageController extends Controller
         if ($friend === null) {
             return response('404 Not Found', 404);
         } else {
+            //取得好友對話訊息
             $friendMessages = DB::table('friends_message')
                 ->join('users', function ($join) {
                     $join->on('users.id', '=', 'friends_message.user_id');
                 })
                 ->select(
+                    'friends_message.id',
                     'users.id as uid',
                     'name',
                     'photo',
@@ -136,6 +182,7 @@ class PageController extends Controller
                 ->where('friends_message.friend_id', $fid)
                 ->orderBy('friends_message.created_at', 'asc')
                 ->get();
+            //整理訊息格式
             $date = "";
             foreach ($friendMessages as &$friendMessage) {
                 $friendMessage->photo = asset($friendMessage->photo);
@@ -160,16 +207,17 @@ class PageController extends Controller
                 }
             }
             unset($friendMessage);
-
+            //綑綁傳回blade的資料
             $binding = [
                 'title' => $friend->fu_name,
                 'name'=>auth('web')->user()->name,
                 'photo'=>auth('web')->user()->photo,
+                'id'=>auth('web')->user()->id,
                 'fu_name'=>$friend->fu_name,
                 'fu_photo'=>$friend->fu_photo,
                 'friendMessages' => $friendMessages,
             ];
-
+            //帶著 $binding顯示friendMessage畫面
             return view('friend.friendMessage', $binding);
         }
     }

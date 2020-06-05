@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Validator;
+use DB;
 use Illuminate\Support\Facades\Auth;
 use App\user;
-use App\friend;
+use App\Friend;
+use App\FriendMessage;
 use Session;
 
 class FriendController extends Controller
@@ -85,18 +87,30 @@ class FriendController extends Controller
             return response()->json(['success' => '成功刪除此好友']);
         }
     }
-    public function friendCreateMessageProcess(Request $request, $fid)
+    public function addMessageProcess(Request $request, $fid)
     {
         $input = request()->all();
-
-        $validator = Validator::make($request->all(), [
+        if (isset($input['file'])) {
+            $input['message']=$input['file'];
+        }
+        $validator = Validator::make($input, [
             'message' => 'required',
         ]);
-
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()->all()]);
         } else {
             event(new \App\Events\createFriendMessage($fid, auth('api')->user()->id, $input));
         }
+    }
+    public function checkReadyMessageProcess(Request $request, $fid)
+    {
+        $input = request()->all();
+
+        $friendr_ready = FriendMessage::where('friend_id', $fid)
+            ->where('user_id', '!=', auth('api')->user()->id)
+            ->update(['type' => 1]);
+        event(new \App\Events\getReadyMessage($fid));
+        event(new \App\Events\getRecordMessage(auth('api')->user()->id));
+        return response()->json(['success' => '確認訊息功能通過']);
     }
 }

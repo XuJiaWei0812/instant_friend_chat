@@ -30,7 +30,7 @@
                     <a class="nav-link text-light" href="/friend/roster">好友名單</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-light" href="/">聊天紀錄</a>
+                    <a class="nav-link text-light" href="/friend/record">聊天紀錄</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-light" href="/friend/apply">申請審核</a>
@@ -55,6 +55,14 @@
 
     <script type="text/javascript" src="{{asset('js/jquery-3.4.1.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('bootstrap/js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript">
+        if (!!window.performance && window.performance.navigation.type === 2) {
+        //!! 用來檢查 window.performance 是否存在
+        //window.performance.navigation.type ===2 表示使用 back or forward
+        console.log('Reloading');
+        window.location.reload();//或是其他動作
+        }
+    </script>
     @yield('javascript')
 </body>
 

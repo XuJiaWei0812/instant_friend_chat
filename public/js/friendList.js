@@ -54,8 +54,6 @@ function deleteFriend(fid) {
     });
 }
 $(function () {
-
-
     $("#logout").click(function (event) {
         event.preventDefault();
         logout()

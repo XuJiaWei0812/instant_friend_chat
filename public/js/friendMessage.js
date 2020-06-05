@@ -28,8 +28,8 @@ $(function () {
     function fileUpload(formData) {
         $.ajax({
             type: "POST",
-            url: (window.location.pathname + '/create'),
-            dataType: "text",
+            url: ('/api' + window.location.pathname),
+            dataType: "json",
             data: formData,
             processData: false,
             contentType: false,

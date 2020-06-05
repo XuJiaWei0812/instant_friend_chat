@@ -3,10 +3,10 @@
 @section('title',$title)
 
 @section('content')
-<section class="container-fluid" id="show">
+<section class="container-fluid">
     <div class="row mx-auto">
         <div class="col-lg-8 mx-auto py-3">
-            <ul class="list-group">
+        <ul class="list-group" id="list-ul{{$id}}">
                 {{--好友名單start--}}
                 @if (!empty($friendRosters))
                 @foreach ($friendRosters as $friendRoster)
@@ -18,7 +18,8 @@
                         <h5 class="mb-1 align-items-center flex-grow-1">
                             {{$friendRoster->fu_name}}
                         </h5>
-                        <span class="badge {{$friendRoster->online == 1 ? "badge-success" : "badge-danger"}}">
+                        <span id="user{{$friendRoster->fu_id}}"
+                            class="badge {{$friendRoster->online == 1 ? "badge-success" : "badge-danger"}}">
                             {{$friendRoster->online == 1 ? "上線中" : "下線中"}}
                         </span>
                     </div>
@@ -26,7 +27,34 @@
                 @include('friend.friendListModal')
                 @endforeach
                 {{--好友名單end--}}
-
+                {{--聊天紀錄start--}}
+                @elseif(!empty($friendRecords))
+                @foreach ($friendRecords as $friendRecord)
+                <a href="{{ asset('/friend/chat/'.$friendRecord->fid) }}"
+                    class="p-2 list-group-item list-group-item-action">
+                    <img src="{{ asset($friendRecord->photo) }}" class="rounded-circle mr-2 float-left" alt="無法顯示圖片"
+                        width="62px" height="62px">
+                    <div class="d-flex flex-column">
+                        <div class="p-1 d-flex justify-content-between">
+                            <h5 class="flex-grow-1">
+                                {{ $friendRecord->name }}
+                            </h5>
+                            <span id="time{{$friendRecord->fid}}">
+                                {{ $friendRecord->date }} {{ $friendRecord->time }}
+                            </span>
+                        </div>
+                        <div class="p-1 flex-fill" id="message-unread{{$friendRecord->fid}}">
+                            <span id="message{{$friendRecord->fid}}">{{ $friendRecord->message }}</span>
+                            @if ($friendRecord->unread>0)
+                            <span class="badge badge-primary badge-pill float-right" id="unread{{$friendRecord->fid}}">
+                                {{ $friendRecord->unread }}
+                            </span>
+                            @endif
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+                {{--聊天紀錄end--}}
                 {{--好友審核start--}}
                 @elseif(!empty($friendApplys))
                 @foreach ($friendApplys as $friendApply)
@@ -50,4 +78,5 @@
 
 @section('javascript')
 <script type="text/javascript" src="{{asset('js/friendList.js')}}"></script>
+<script src="{{mix('js/app.js')}}" type="text/javascript"></script>
 @endsection

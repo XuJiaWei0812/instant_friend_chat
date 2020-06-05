@@ -37,4 +37,5 @@
 
 @section('javascript')
 <script src="{{asset('js/user.js')}}"></script>
+<script src="{{mix('js/app.js')}}" type="text/javascript"></script>
 @endsection

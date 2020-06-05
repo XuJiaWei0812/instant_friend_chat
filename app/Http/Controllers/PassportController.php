@@ -29,9 +29,7 @@ class PassportController extends Controller
             return response()->json(['error'=>[$validator->errors()->first()]]);
         }
         $input=$request->all();
-
         $user = User::create($input);
-
         return response()->json(['success'=>'註冊成功']);
     }
     public function loginProcess(Request $request)
@@ -43,6 +41,7 @@ class PassportController extends Controller
             $success['token'] =  $user->createToken('token')->accessToken;
             $success['uid']=$user->id;
             $success['message']=$user->name." 登入成功 ";
+            event(new \App\Events\checkLogin());
             return response()->json(['success' => $success]);
         } else {
             return response()->json(['error'=>['信箱或密碼錯誤']]);
@@ -56,6 +55,7 @@ class PassportController extends Controller
             $user->save();
             Auth::user()->AauthAcessToken()->delete();
             Auth::guard('web')->logout();
+            event(new \App\Events\checkLogin());
             return response()->json(['success' => '成功登出']);
         }
     }

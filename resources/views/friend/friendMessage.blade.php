@@ -21,10 +21,10 @@
     {{--日期判斷end--}}
     {{--使用者訊息start--}}
     @if (auth('web')->user()->id==$friendMessage->uid)
-    <div class="row mx-auto pt-3">
-        <div class="col-8 mx-auto d-flex justify-content-end">
+    <div class="row pt-3">
+        <div class="col-10 d-flex justify-content-end">
             <div class="align-self-end mr-2">
-                <span class="pl-2 font-weight-bold text-white m-0">
+                <span class="pl-2 font-weight-bold text-white m-0" id="ready{{$friendMessage->id}}">
                     {{$friendMessage->ready}}
                 </span>
                 <br>
@@ -45,8 +45,8 @@
     {{--使用者訊息end--}}
     {{--好友的訊息start--}}
     @if (auth('web')->user()->id!=$friendMessage->uid)
-    <div class="row my-2 mx-auto pt-3">
-        <div class="col-8 mx-auto d-flex justify-content-start">
+    <div class="row my-2 pt-3">
+        <div class="col-10 d-flex justify-content-start">
             <img src="{{$friendMessage->photo}}" class="rounded-circle mr-2" width="48px" height="48px" alt="圖片無法顯示">
             <div class="rounded bg-white align-self-center p-2">
                 @if (strpos($friendMessage->message,'images') !== false)
