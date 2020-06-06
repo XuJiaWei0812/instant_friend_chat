@@ -19,8 +19,8 @@
                             {{$friendRoster->fu_name}}
                         </h5>
                         <span id="user{{$friendRoster->fu_id}}"
-                            class="badge {{$friendRoster->online == 1 ? "badge-success" : "badge-danger"}}">
-                            {{$friendRoster->online == 1 ? "上線中" : "下線中"}}
+                            class="badge {{$friendRoster->online == "上線中" ? "badge-success" : "badge-danger"}}">
+                            {{$friendRoster->online}}
                         </span>
                     </div>
                 </button>

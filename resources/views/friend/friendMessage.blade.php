@@ -5,7 +5,7 @@
 @section('content')
 <section class="container-fluid" id="message_section">
     <div class="row mx-auto">
-        <div class="col-8 mx-auto text-center text-light">
+        <div class="col-10 mx-auto text-center text-light">
             <h5>與 {{$fu_name}} 對話中</h5>
         </div>
     </div>
@@ -13,7 +13,7 @@
     {{--日期判斷start--}}
     @if ($friendMessage->date != "")
     <div class="row mx-auto" style="opacity:0.8">
-        <div class="col-8 bg-white rounded mx-auto text-center">
+        <div class="col-10 bg-white rounded mx-auto text-center" name="dateRow">
             {{$friendMessage->date}}
         </div>
     </div>
@@ -21,8 +21,8 @@
     {{--日期判斷end--}}
     {{--使用者訊息start--}}
     @if (auth('web')->user()->id==$friendMessage->uid)
-    <div class="row pt-3">
-        <div class="col-10 d-flex justify-content-end">
+    <div class="row mx-auto py-3">
+        <div class="col-10 mx-auto d-flex justify-content-end">
             <div class="align-self-end mr-2">
                 <span class="pl-2 font-weight-bold text-white m-0" id="ready{{$friendMessage->id}}">
                     {{$friendMessage->ready}}
@@ -45,8 +45,8 @@
     {{--使用者訊息end--}}
     {{--好友的訊息start--}}
     @if (auth('web')->user()->id!=$friendMessage->uid)
-    <div class="row my-2 pt-3">
-        <div class="col-10 d-flex justify-content-start">
+    <div class="row mx-auto py-3">
+        <div class="col-10 mx-auto d-flex justify-content-start">
             <img src="{{$friendMessage->photo}}" class="rounded-circle mr-2" width="48px" height="48px" alt="圖片無法顯示">
             <div class="rounded bg-white align-self-center p-2">
                 @if (strpos($friendMessage->message,'images') !== false)
@@ -88,4 +88,7 @@
 @section('javascript')
 <script type="text/javascript" src="{{asset('js/friendMessage.js')}}"></script>
 <script src="{{mix('js/app.js')}}" type="text/javascript"></script>
+<script type="text/javascript">
+    console.log($("div[name='dateRow']").text().indexOf("今天"))
+</script>
 @endsection

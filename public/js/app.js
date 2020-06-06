@@ -25320,9 +25320,10 @@ window.Echo.channel('create-friendMessage').listen('createFriendMessage', functi
         console.log(data.success);
       }
     });
+    console.log($("div[name='dateRow']").text().indexOf("今天"));
 
-    if (e.message.date != "") {
-      $('#message_section').append('<div class="row mx-auto" style="opacity:0.8">' + '<div class="col-8 bg-white rounded mx-auto text-center">' + e.message.date + '</div>' + '</div>');
+    if ($("div[name='dateRow']").text().indexOf("今天") == -1) {
+      $('#message_section').append('<div class="row mx-auto" style="opacity:0.8">' + '<div class="col-10 bg-white rounded mx-auto text-center" name="dateRow">' + '今天' + '</div>' + '</div>');
     }
 
     if (e.message.message.indexOf('images') >= 0) {
@@ -25330,9 +25331,9 @@ window.Echo.channel('create-friendMessage').listen('createFriendMessage', functi
     }
 
     if (e.message.uid == localStorage.getItem('uid')) {
-      $('#message_section').append('<div class="row pt-3">' + '<div class="col-10 d-flex justify-content-end">' + '<div class="align-self-end mr-2">' + '<span class="pl-2 font-weight-bold text-white m-0" id="ready' + e.message.id + '">' + '</span>' + '<br>' + '<span class="font-weight-bold text-white m-0">' + e.message.time + '</span>' + '</div >' + '<div class="bg-white rounded align-self-center p-2">' + e.message.message + '</div>' + '</div>' + '</div >');
+      $('#message_section').append('<div class="row mx-auto py-3">' + '<div class="col-10 mx-auto d-flex justify-content-end">' + '<div class="align-self-end mr-2">' + '<span class="pl-2 font-weight-bold text-white m-0" id="ready' + e.message.id + '">' + '</span>' + '<br>' + '<span class="font-weight-bold text-white m-0">' + e.message.time + '</span>' + '</div >' + '<div class="bg-white rounded align-self-center p-2">' + e.message.message + '</div>' + '</div>' + '</div>');
     } else {
-      $('#message_section').append('<div class="row my-2 pt-3">' + '<div class="col-10 d-flex justify-content-start">' + '<img src="' + e.message.photo + '" class="rounded-circle mr-2" width="48px" height="48px" alt="圖片無法顯示">' + '<div class="rounded bg-white align-self-center p-2">' + e.message.message + '</div>' + '<div class="align-self-end ml-2">' + '<span class="text-left text-nowrap font-weight-bold text-white m-0">' + e.message.time + '</span>' + '</div>' + '</div>' + '</div>');
+      $('#message_section').append('<div class="row mx-auto py-3">' + '<div class="col-10 mx-auto d-flex justify-content-start">' + '<img src="' + e.message.photo + '" class="rounded-circle mr-2" width="48px" height="48px" alt="圖片無法顯示">' + '<div class="rounded bg-white align-self-center p-2">' + e.message.message + '</div>' + '<div class="align-self-end ml-2">' + '<span class="text-left text-nowrap font-weight-bold text-white m-0">' + e.message.time + '</span>' + '</div>' + '</div>' + '</div>');
     }
   }
 });
@@ -25340,22 +25341,21 @@ window.Echo.channel('get-readyMessage').listen('getReadyMessage', function (e) {
   if ('/friend/chat/' + e.fid + '' === window.location.pathname) {
     console.log(e);
     $.each(e.message, function (index, val) {
-      $("#ready" + val.id).html("已讀");
+      $("#ready" + val.id).text("已讀");
     });
   }
 });
 window.Echo.channel('check-lgoin').listen('checkLogin', function (e) {
   if ('/friend/roster' === window.location.pathname) {
     $.each(e.loginCheck, function (index, val) {
-      $("#user" + val.id).removeClass("badge-success");
-      $("#user" + val.id).removeClass("badge-danger");
+      $("#user" + val.id).removeClass("badge-success badge-danger");
 
-      if (val.online == 0) {
+      if (val.online == "下線中") {
         $("#user" + val.id).addClass("badge-danger");
-        $("#user" + val.id).html("下線中");
+        $("#user" + val.id).html(val.online);
       } else {
         $("#user" + val.id).addClass("badge-success");
-        $("#user" + val.id).html("上線中");
+        $("#user" + val.id).html(val.online);
       }
     });
   }

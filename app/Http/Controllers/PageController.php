@@ -8,7 +8,6 @@ use App\FriendMessage;
 use Cache;
 use Illuminate\Support\Facades\Artisan;
 
-
 class PageController extends Controller
 {
     public function loginPage()
@@ -33,7 +32,14 @@ class PageController extends Controller
                 $join->on('users.id', '=', 'friends.inviter_user_id')
                     ->orOn('users.id', '=', 'friends.invitee_user_id');
             })
-            ->select('friends.id as fid', 'users.id as fu_id', 'name as fu_name', 'email as fu_email', 'photo', 'online')
+            ->select(
+                'friends.id as fid',
+                'users.id as fu_id',
+                'name as fu_name',
+                'email as fu_email',
+                'photo',
+                DB::raw("IF(online=0,'下線中','上線中') as online"),
+            )
             ->where('friends.type', '=', 1)
             ->where('users.id', '<>', auth('web')->user()->id)
             ->Where(function ($query) {
@@ -174,36 +180,30 @@ class PageController extends Controller
                     'name',
                     'photo',
                     'message',
-                    DB::raw("DATE_FORMAT(friends_message.created_at,'%Y-%m-%d') as date"),
+                    DB::raw("case
+                    when DATE(NOW())=DATE(friends_message.created_at) then '今天'
+                    when  DATE_SUB(DATE(NOW()),INTERVAL 1 DAY)=DATE(friends_message.created_at) then '昨天'
+                    else  DATE(friends_message.created_at)
+                    END AS date"),
                     DB::raw("DATE_FORMAT(friends_message.created_at,'%H:%i') as time"),
+                    DB::raw("IF(friends_message.type=1,'已讀',null) as ready"),
                     'friends_message.created_at',
-                    'friends_message.type as ready'
                 )
                 ->where('friends_message.friend_id', $fid)
                 ->orderBy('friends_message.created_at', 'asc')
                 ->get();
+
             //整理訊息格式
             $date = "";
             foreach ($friendMessages as &$friendMessage) {
                 $friendMessage->photo = asset($friendMessage->photo);
-
-                if ($friendMessage->ready == '1') {
-                    $friendMessage->ready = "已讀";
-                } else {
-                    $friendMessage->ready = "";
-                }
-
                 if (strpos($friendMessage->message, 'images') !== false) {
                     $friendMessage->message = asset($friendMessage->message);
                 }
-
                 if ($date != $friendMessage->date) {
                     $date = $friendMessage->date;
-                    if ($date == date("Y-m-d")) {
-                        $friendMessage->date = "今天";
-                    }
                 } else {
-                    $friendMessage->date = "";
+                    $friendMessage->date = null;
                 }
             }
             unset($friendMessage);

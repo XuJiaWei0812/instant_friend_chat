@@ -12,7 +12,7 @@
     <title>@yield('title')</title>
 </head>
 
-<body class="bg-dark">
+<body class="bg-secondary">
     @if (Auth::check())
     <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="navbar-brand">
@@ -38,7 +38,7 @@
             </ul>
             <ul class="navbar-nav ml-auto" id="nav-li">
                 <li class="nav-item">
-                    <button type="button" class="ml-3 btn btn-success" data-toggle="modal" data-target="#exampleModal">
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
                         添加好友
                     </button>
                 </li>
@@ -57,11 +57,14 @@
     <script type="text/javascript" src="{{asset('bootstrap/js/bootstrap.min.js')}}"></script>
     <script type="text/javascript">
         if (!!window.performance && window.performance.navigation.type === 2) {
-        //!! 用來檢查 window.performance 是否存在
-        //window.performance.navigation.type ===2 表示使用 back or forward
-        console.log('Reloading');
-        window.location.reload();//或是其他動作
+            //window.performance.navigation.type ===2 表示使用 back or forward
+            console.log('Reloading');
+            window.location.reload();
         }
+        $("input").mouseup(function () {
+        $(".print-error-msg").find("ul").html('');
+        $(".print-error-msg").css('display', 'none');
+        });
     </script>
     @yield('javascript')
 </body>

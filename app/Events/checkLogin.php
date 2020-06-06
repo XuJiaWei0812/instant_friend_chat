@@ -24,7 +24,12 @@ class checkLogin implements ShouldBroadcast
 
     public function __construct()
     {
-        $users=DB::table('users')->select('id', 'online')->get();
+        $users=DB::table('users')
+        ->select(
+            'id',
+             DB::raw("IF(online=0,\"下線中\",\"上線中\") as online"),
+        )
+        ->get();
         $this->loginCheck=$users;
     }
 

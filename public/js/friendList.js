@@ -58,18 +58,11 @@ $(function () {
         event.preventDefault();
         logout()
     });
-
     $("#createFriend").submit(function (event) {
         event.preventDefault();
         var formData = new FormData(this);
         createFriend(formData);
     });
-
-    $("input").mouseup(function () {
-        $(".print-error-msg").find("ul").html('');
-        $(".print-error-msg").css('display', 'none');
-    });
-
     function createFriend(formData) {
         $.ajax({
             type: "POST",

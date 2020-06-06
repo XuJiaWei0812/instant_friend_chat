@@ -49,31 +49,17 @@ class createFriendMessage implements ShouldBroadcast
                 'name',
                 'photo',
                 'message',
-                DB::raw("DATE_FORMAT(friends_message.created_at,'%Y-%m-%d') as date"),
                 DB::raw("DATE_FORMAT(friends_message.created_at,'%H:%i') as time"),
-                'friends_message.type as ready'
             )
             ->where('friends_message.id', $addMessage->id)
             ->where('friend_id', $fid)
             ->orderBy('time', 'desc')
             ->first();
 
-        $compare_date = DB::table('friends_message')
-            ->where('friend_id', $fid)
-            ->where('id', "!=", $addMessage->id)
-            ->where(DB::raw("DATE_FORMAT(created_at,'%Y-%m-%d')"), $getMessage->date)
-            ->get();
-
         $getMessage->photo = asset($getMessage->photo);
         if (strpos($getMessage->message, 'images') !== false) {
             $getMessage->message = asset($getMessage->message);
         }
-        if (sizeof($compare_date) == 0) {
-            $getMessage->date = "今天";
-        } else {
-            $getMessage->date = "";
-        }
-
         $this->message =  $getMessage;
     }
 
