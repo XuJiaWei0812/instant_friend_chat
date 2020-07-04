@@ -31,7 +31,7 @@
 
                 <div class="form-group">
                     <label for="password_confirmatiom">確認密碼:</label>
-                    <input type="password" class="form-control" id="c_password" name="c_password" placeholder="確認密碼">
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="確認密碼">
                 </div>
 
                 <div class="form-group mt-3">

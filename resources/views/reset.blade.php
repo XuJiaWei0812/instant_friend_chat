@@ -6,37 +6,29 @@
 <section class="container-fluid" id="login_section">
     <div class="row">
         <div class="col-lg-5 m-auto py-3">
-            <form method="POST" id="login" class="bg-light rounded border border-dark mx-auto p-3">
+            <form method="POST" id="resetPassword" class="bg-light rounded border border-dark mx-auto p-3">
                 <div class="form-group">
                     <h1 class="text-center">{{$title}}</h1>
                 </div>
                 <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp"
-                        placeholder="電子郵件" value="{{ old('email') }}">
+                    <label for="captcha">輸入認證瑪:</label>
+                    <input type="text" class="form-control" id="captcha" name="captcha" aria-describedby="captchaHelp"
+                        placeholder="輸入驗證碼">
                 </div>
-
                 <div class="form-group">
-                    <label for="password">密碼:</label>
+                    <label for="password">設定新密碼:</label>
                     <input type="password" class="form-control" id="password" name="password"
-                        aria-describedby="passwordHelp" placeholder="密碼">
+                        aria-describedby="passwordHelp" placeholder="設定新密碼">
                 </div>
-
-                <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">登入</button>
-                    <small class="form-text text-muted text-center pt-3">
-                        <p>
-                            還不是會員?
-                            <button id="goToRegister" type="button" class="btn btn-link p-0 pb-1">加入會員</button>
-                            還是忘記密碼?
-                            <button type="button" class="btn btn-link p-0 pb-1" data-toggle="modal"
-                                data-target="#exampleModal">
-                                忘記密碼
-                            </button>
-                        </p>
-                    </small>
+                <div class="form-group">
+                    <label for="password_confirmation">確認新密碼:</label>
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation"
+                        aria-describedby="passwordHelp" placeholder="確認新密碼">
                 </div>
                 @include('layout.validationErrorMessag')
+                <div class="form-group mt-3">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">送出</button>
+                </div>
             </form>
         </div>
     </div>
@@ -54,9 +46,9 @@
             </div>
             <form method="POST" id="forget" class="px-3">
                 <div class="modal-body">
-                        <label for="email">電子郵件Email:</label>
-                        <input type="email" class="form-control" id="checkEmail" name="checkEmail" aria-describedby="checkEmailHelp"
-                            placeholder="電子郵件" value="{{ old('email') }}">
+                    <label for="email">電子郵件Email:</label>
+                    <input type="email" class="form-control" id="checkEmail" name="checkEmail"
+                        aria-describedby="checkEmailHelp" placeholder="電子郵件" value="{{ old('email') }}">
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">送出</button>

@@ -5,16 +5,34 @@ $(function () {
         }
     });
 
+    $("#goToRegister").click(function (event) {
+        event.preventDefault();
+        window.location.href = '/register';
+    });
+
+
     $("#register").submit(function (event) {
         event.preventDefault();
-        var formData = new FormData(this);
+        let formData = new FormData(this);
         register(formData)
     });
 
     $("#login").submit(function (event) {
         event.preventDefault();
-        var formData = new FormData(this);
+        let formData = new FormData(this);
         login(formData)
+    });
+
+    $("#forget").submit(function (event) {
+        event.preventDefault();
+        let formData = new FormData(this);
+        forget(formData)
+    });
+
+    $("#resetPassword").submit(function (event) {
+        event.preventDefault();
+        let formData = new FormData(this);
+        reset(formData)
     });
 
     $("#logout").click(function (event) {
@@ -56,6 +74,45 @@ $(function () {
             success: function (data) {
                 if ($.isEmptyObject(data.error)) {
                     alert(data.success);
+                    window.location.replace("/");
+                } else {
+                    printErrorMsg(data.error);
+                }
+            }
+        });
+    }
+
+    function forget(formData) {
+        $.ajax({
+            type: "POST",
+            url: "/api/forget",
+            dataType: "json",
+            data: formData,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (data) {
+                if ($.isEmptyObject(data.error)) {
+                    alert(data.sucess);
+                    window.location.replace("/");
+                } else {
+                    alert(data.error);
+                }
+            }
+        });
+    }
+    function reset(formData) {
+        $.ajax({
+            type: "POST",
+            url: "/api/reset",
+            dataType: "json",
+            data: formData,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (data) {
+                if ($.isEmptyObject(data.error)) {
+                    alert(data.sucess);
                     window.location.replace("/");
                 } else {
                     printErrorMsg(data.error);

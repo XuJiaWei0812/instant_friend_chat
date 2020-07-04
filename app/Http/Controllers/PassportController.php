@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\User;
+use DB;
 use Illuminate\Support\Facades\Auth;
 use Validator;
+use Mail;
 use Session;
 
 class PassportController extends Controller
@@ -21,16 +23,17 @@ class PassportController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required',
-            'c_password' => 'required|same:password',
+            'password_confirmation' => 'required|same:password',
             'type'=>'in:0,1',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error'=>[$validator->errors()->first()]]);
+        } else {
+            $input=$request->all();
+            $user = User::create($input);
+            return response()->json(['success'=>'註冊成功']);
         }
-        $input=$request->all();
-        $user = User::create($input);
-        return response()->json(['success'=>'註冊成功']);
     }
     public function loginProcess(Request $request)
     {
@@ -45,6 +48,60 @@ class PassportController extends Controller
             return response()->json(['success' => $success]);
         } else {
             return response()->json(['error'=>['信箱或密碼錯誤']]);
+        }
+    }
+    public function forgetProcess(Request $request)
+    {
+        $input=$request->all();
+        $user = User::where("email", $input["checkEmail"])->pluck('email');
+        if (sizeof($user)<1) {
+            return response()->json(['error'=>["查無此電子郵件"]]);
+        } else {
+            //產生亂數認證碼
+            $str="QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm";
+            str_shuffle($str);
+            $captcha=substr(str_shuffle($str), 26, 5);
+            User::where("email", $input["checkEmail"])->update(['captcha'=>$captcha]);
+            //送出認證碼信件
+            $mail_binding = [
+                'toEmail' => $input['checkEmail'],
+                'captcha' => $captcha,
+            ];
+            Mail::send(
+                'emailPost',
+                $mail_binding,
+                function ($mail) use ($mail_binding) {
+                    //收件人
+                    $mail->to($mail_binding['toEmail']);
+                    // //寄件人
+                    // $mail->from("TEST客服中心");
+                    //郵件主旨
+                    $mail->subject($mail_binding['toEmail'].'請重新設定密碼');
+                }
+            );
+            return response()->json(['sucess'=>["請前往確認信箱"]]);
+        }
+    }
+    public function resetProcess(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'captcha' => 'required|min:5|max:5',
+            'password' => 'required',
+            'password_confirmation' => 'required|same:password',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error'=>[$validator->errors()->first()]]);
+        } else {
+            $input=$request->all();
+            $count = User::where("captcha", $input["captcha"])->count();
+            if ($count>0) {
+                $password = bcrypt($input["password"]);
+                $user = User::where("captcha", $input["captcha"])->update(['password'=>  $password,'captcha'=>null]);
+                return response()->json(['sucess'=>["更改密碼完成"]]);
+            } else {
+                return response()->json(['error'=>["驗證碼錯誤"]]);
+            }
         }
     }
     public function logout(Request $request)

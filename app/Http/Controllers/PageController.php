@@ -25,6 +25,14 @@ class PageController extends Controller
 
         return view('register', $binding);
     }
+    public function resetPage()
+    {
+        $binding = [
+            'title' => '重設密碼',
+        ];
+
+        return view('reset', $binding);
+    }
     public function friendRosterPage()
     {
         $friendRosters = DB::table('friends')

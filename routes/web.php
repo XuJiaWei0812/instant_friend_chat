@@ -1,11 +1,14 @@
 <?php
 Route::get('/test', function (Request $request) {
-   return response()->json(['test'=>auth()->user()]);
+    return response()->json(['test'=>auth()->user()]);
 });
 
 Route::get('/', 'PageController@loginPage')->name('login')->middleware('login.auth');
 
 Route::get('/register', 'PageController@registerPage')->middleware('login.auth');
+
+Route::get('/reset', 'PageController@resetPage')->middleware('login.auth');
+
 
 Route::group(['middleware' => ['friend.auth'], 'prefix' => 'friend'], function () {
     Route::get('/roster', 'PageController@friendRosterPage');
