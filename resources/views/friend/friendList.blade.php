@@ -3,14 +3,14 @@
 @section('title',$title)
 
 @section('content')
-<section class="container-fluid">
+<section class="container-fluid px-0">
     <div class="row mx-auto">
-        <div class="col-lg-8 mx-auto py-3">
+        <div class="col-lg-8 mx-auto px-0">
         <ul class="list-group" id="list-ul{{$id}}">
                 {{--好友名單start--}}
                 @if (!empty($friendRosters))
                 @foreach ($friendRosters as $friendRoster)
-                <button type="button" class="list-group-item list-group-item-action" data-toggle="modal"
+                <a href="#" class="list-group-item list-group-item-action" data-toggle="modal"
                     data-target="#friendLsitModal{{$friendRoster->fid}}">
                     <div class="d-flex w-100 justify-content-start align-items-center">
                         <img src="{{asset($friendRoster->photo)}}" class="rounded-circle mr-3" alt="" width="40px"
@@ -23,7 +23,7 @@
                             {{$friendRoster->online}}
                         </span>
                     </div>
-                </button>
+                </a>
                 @include('friend.friendListModal')
                 @endforeach
                 {{--好友名單end--}}

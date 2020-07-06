@@ -4,7 +4,6 @@ namespace App\Events;
 
 use App\FriendMessage;
 use DB;
-use Image;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -26,15 +25,6 @@ class createFriendMessage implements ShouldBroadcast
 
     public function __construct($fid, $uid, $input)
     {
-        if (isset($input['file'])) {
-            $photo = $input['file']; //有上傳圖片
-            $file_extension = $photo->getClientOriginalExtension(); //取得副檔名
-            $file_name = uniqid() . '.' . $file_extension;
-            $file_relative_path = 'images/' . $file_name;
-            $file_path = public_path($file_relative_path);
-            $image = Image::make($photo)->fit(390, 300)->save($file_path);
-            $input['message'] = $file_relative_path;
-        }
         $input['friend_id']=$fid;
         $input['user_id']=$uid;
         $addMessage = FriendMessage::create($input);

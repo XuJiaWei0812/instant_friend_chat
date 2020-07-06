@@ -176,5 +176,6 @@ return [
         'username'              => '使用者名稱',
         'year'                  => '年',
         'captcha'               => '驗證碼',
+        'file'               => '檔案',
     ],
 ];

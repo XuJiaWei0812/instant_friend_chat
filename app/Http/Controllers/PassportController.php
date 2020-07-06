@@ -9,6 +9,7 @@ use DB;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Mail;
+use Image;
 use Session;
 
 class PassportController extends Controller
@@ -20,7 +21,8 @@ class PassportController extends Controller
     public function registerProcess(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|unique:users',
+            'photo' => ['file', 'image', 'max:10240'],
             'email' => 'required|email|unique:users',
             'password' => 'required',
             'password_confirmation' => 'required|same:password',
@@ -31,6 +33,16 @@ class PassportController extends Controller
             return response()->json(['error'=>[$validator->errors()->first()]]);
         } else {
             $input=$request->all();
+            if (isset($input['photo'])) {
+                $photo = $input['photo']; //有上傳圖片
+                $file_extension = $photo->getClientOriginalExtension(); //取得副檔名
+                $file_name = uniqid() . '.' . $file_extension;
+                $file_relative_path = 'images/' . $file_name;
+                $file_path = public_path($file_relative_path);
+                $image = Image::make($photo)->fit(348, 348)->save($file_path);
+                $input['photo'] = $file_relative_path;
+            }
+            $input["password"]=bcrypt($input["password"]);
             $user = User::create($input);
             return response()->json(['success'=>'註冊成功']);
         }
@@ -101,6 +113,31 @@ class PassportController extends Controller
                 return response()->json(['sucess'=>["更改密碼完成"]]);
             } else {
                 return response()->json(['error'=>["驗證碼錯誤"]]);
+            }
+        }
+    }
+    public function edit(Request $request)
+    {
+        if (Auth::check()) {
+            $validator = Validator::make($request->all(), [
+             'name' => 'required|unique:users',
+             'photo' => ['file', 'image', 'max:10240'],
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['error'=>[$validator->errors()->first()]]);
+            } else {
+                $input=$request->all();
+                if (isset($input['photo'])) {
+                    $photo = $input['photo']; //有上傳圖片
+                    $file_extension = $photo->getClientOriginalExtension(); //取得副檔名
+                    $file_name = uniqid() . '.' . $file_extension;
+                    $file_relative_path = 'images/' . $file_name;
+                    $file_path = public_path($file_relative_path);
+                    $image = Image::make($photo)->fit(348, 348)->save($file_path);
+                    $input['photo'] = $file_relative_path;
+                }
+                User::where("id",Auth::user()->id)->update($input);
+                return response()->json(['success'=>["編輯成功"]]);
             }
         }
     }

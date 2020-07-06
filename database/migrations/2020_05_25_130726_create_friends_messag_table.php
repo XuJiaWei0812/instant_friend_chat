@@ -13,7 +13,7 @@ class CreateFriendsMessagTable extends Migration
      */
     public function up()
     {
-        Schema::create('friends_messag', function (Blueprint $table) {
+        Schema::create('friends_message', function (Blueprint $table) {
             $table->bigIncrements('id');
 
             $table->unsignedBigInteger('friend_id');

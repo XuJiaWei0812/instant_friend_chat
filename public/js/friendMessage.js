@@ -10,21 +10,28 @@ $(function () {
         //把畫面置底
         scrollTop: $(window).height() + 9999
     });
+    $("#logout").click(function (event) {
+        event.preventDefault();
+        logout();
+    })
     $("#file_upload").change(function (event) {
         event.preventDefault();
-        var formData = new FormData();
+        let formData = new FormData();
         formData.append("file", this.files[0]);
         fileUpload(formData);
+        formData = null;
+        $("#file_upload").val('');
     });
     $("textarea").keypress(function (event) {
         if (event.keyCode === 13 || event.keyCode === 10) {
             event.preventDefault();
-            var formData = new FormData();
+            let formData = new FormData();
             formData.append("message", $("#message").val());
             createFriendMessage(formData);
             $("#message").val("")
         }
     });
+
     function fileUpload(formData) {
         $.ajax({
             type: "POST",
@@ -38,7 +45,7 @@ $(function () {
                 if ($.isEmptyObject(data.error)) {
                     console.log("ok");
                 } else {
-                    printErrorMsg(data.error);
+                    alert(data.error);
                 }
             }
         });
@@ -47,7 +54,7 @@ $(function () {
     function createFriendMessage(formData) {
         $.ajax({
             type: "POST",
-            url: ('/api'+window.location.pathname),
+            url: ('/api' + window.location.pathname),
             dataType: "json",
             data: formData,
             contentType: false,
@@ -72,10 +79,6 @@ $(function () {
         });
     }
 
-    $("#logout").click(function (event) {
-        event.preventDefault();
-        logout()
-    });
     function logout() {
         $.ajax({
             type: "GET",

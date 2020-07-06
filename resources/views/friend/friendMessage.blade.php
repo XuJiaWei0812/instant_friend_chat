@@ -4,16 +4,11 @@
 
 @section('content')
 <section class="container-fluid" id="message_section">
-    <div class="row mx-auto">
-        <div class="col-10 mx-auto text-center text-light">
-            <h5>與 {{$fu_name}} 對話中</h5>
-        </div>
-    </div>
     @foreach ($friendMessages as $friendMessage)
     {{--日期判斷start--}}
     @if ($friendMessage->date != "")
     <div class="row mx-auto" style="opacity:0.8">
-        <div class="col-10 bg-white rounded mx-auto text-center" name="dateRow">
+        <div class="col-10 bg-white rounded mx-auto text-center mt-3" name="dateRow">
             {{$friendMessage->date}}
         </div>
     </div>

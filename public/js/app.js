@@ -25323,7 +25323,7 @@ window.Echo.channel('create-friendMessage').listen('createFriendMessage', functi
     console.log($("div[name='dateRow']").text().indexOf("今天"));
 
     if ($("div[name='dateRow']").text().indexOf("今天") == -1) {
-      $('#message_section').append('<div class="row mx-auto" style="opacity:0.8">' + '<div class="col-10 bg-white rounded mx-auto text-center" name="dateRow">' + '今天' + '</div>' + '</div>');
+      $('#message_section').append('<div class="row mx-auto py-3" style="opacity:0.8">' + '<div class="col-10 bg-white rounded mx-auto text-center" name="dateRow">' + '今天' + '</div>' + '</div>');
     }
 
     if (e.message.message.indexOf('images') >= 0) {

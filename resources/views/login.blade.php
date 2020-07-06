@@ -8,7 +8,7 @@
         <div class="col-lg-5 m-auto py-3">
             <form method="POST" id="login" class="bg-light rounded border border-dark mx-auto p-3">
                 <div class="form-group">
-                    <h1 class="text-center">{{$title}}</h1>
+                    <h3 class="text-center">{{$title}}</h3>
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
@@ -21,7 +21,11 @@
                     <input type="password" class="form-control" id="password" name="password"
                         aria-describedby="passwordHelp" placeholder="密碼">
                 </div>
-
+                <!--錯誤訊息模板-->
+                <div class="alert alert-danger print-error-msg" style="display:none">
+                    <ul></ul>
+                </div>
+                <!--錯誤訊息模板-->
                 <div class="form-group mt-3">
                     <button type="submit" class="btn btn-primary btn-lg btn-block">登入</button>
                     <small class="form-text text-muted text-center pt-3">
@@ -36,7 +40,6 @@
                         </p>
                     </small>
                 </div>
-                @include('layout.validationErrorMessag')
             </form>
         </div>
     </div>
@@ -54,9 +57,9 @@
             </div>
             <form method="POST" id="forget" class="px-3">
                 <div class="modal-body">
-                        <label for="email">電子郵件Email:</label>
-                        <input type="email" class="form-control" id="checkEmail" name="checkEmail" aria-describedby="checkEmailHelp"
-                            placeholder="電子郵件" value="{{ old('email') }}">
+                    <label for="email">電子郵件Email:</label>
+                    <input type="email" class="form-control" id="checkEmail" name="checkEmail"
+                        aria-describedby="checkEmailHelp" placeholder="電子郵件" value="{{ old('email') }}">
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">送出</button>

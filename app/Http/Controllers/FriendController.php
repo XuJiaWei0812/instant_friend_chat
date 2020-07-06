@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use DB;
+use Image;
 use Illuminate\Support\Facades\Auth;
 use App\user;
 use App\Friend;
@@ -90,15 +91,22 @@ class FriendController extends Controller
     public function addMessageProcess(Request $request, $fid)
     {
         $input = request()->all();
-        if (isset($input['file'])) {
-            $input['message']=$input['file'];
-        }
+
         $validator = Validator::make($input, [
-            'message' => 'required',
+            'file' => ['file', 'image', 'max:10240'],
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()->all()]);
         } else {
+            if (isset($input['file'])) {
+                $photo = $input['file']; //有上傳圖片
+                $file_extension = $photo->getClientOriginalExtension(); //取得副檔名
+                $file_name = uniqid() . '.' . $file_extension;
+                $file_relative_path = 'images/' . $file_name;
+                $file_path = public_path($file_relative_path);
+                $image = Image::make($photo)->fit(390, 300)->save($file_path);
+                $input['message'] = $file_relative_path;
+            }
             event(new \App\Events\createFriendMessage($fid, auth('api')->user()->id, $input));
         }
     }

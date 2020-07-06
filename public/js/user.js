@@ -16,6 +16,9 @@ $(function () {
         let formData = new FormData(this);
         register(formData)
     });
+    $("#photo").change(function () {
+        readURLSignUp(this);
+    });
 
     $("#login").submit(function (event) {
         event.preventDefault();
@@ -33,11 +36,6 @@ $(function () {
         event.preventDefault();
         let formData = new FormData(this);
         reset(formData)
-    });
-
-    $("#logout").click(function (event) {
-        event.preventDefault();
-        logout()
     });
 
     function login(formData) {
@@ -80,6 +78,16 @@ $(function () {
                 }
             }
         });
+    }
+
+    function readURLSignUp(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#photoImage").attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
     function forget(formData) {

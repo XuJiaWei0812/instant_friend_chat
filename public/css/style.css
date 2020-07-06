@@ -19,7 +19,7 @@ body {
     font-family: "Noto Sans TC", sans-serif;
 }
 section {
-    padding-top: 74px;
+    padding-top: 56px;
 }
 #message_section {
     padding-bottom: 110px;
@@ -31,4 +31,9 @@ section {
 
 #register_section {
     padding-top: 72px;
+}
+
+#photoImage{
+    width: 114px;
+    height: 114px;
 }

@@ -54,7 +54,7 @@ class getRecordMessage implements ShouldBroadcast
 
         foreach ($friendRecords as &$friendRecord) {
             if (strpos($friendRecord->message, 'images') !== false) {
-                $friendRecord->message = $friendRecord->name."傳送了照片";
+                $friendRecord->message = "對方發送圖片訊息";
             } else {
                 $friendRecord->message=mb_substr(preg_replace('/<[^>]+>|&[^>]+;/', '', $friendRecord->message), 0, 12, 'utf8');
             }

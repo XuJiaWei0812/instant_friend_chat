@@ -15,10 +15,10 @@
 <body class="bg-secondary">
     @if (Auth::check())
     <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="navbar-brand">
-            <img src="{{asset($photo)}}" class="rounded-circle mr-2" width="48px" height="48px" alt="圖片無法顯示">
-            <span>{{$name}}</span>
-        </div>
+        @if (isset($fu_photo))
+        <img src="{{asset($fu_photo)}}" class="rounded-circle mr-3" alt="" width="40px" height="40px">
+        @endif
+        <span class="navbar-brand">{{$title}}</span>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -36,19 +36,28 @@
                     <a class="nav-link text-light" href="/friend/apply">申請審核</a>
                 </li>
             </ul>
-            <ul class="navbar-nav ml-auto" id="nav-li">
+            <ul class="navbar-nav" id="nav-li">
                 <li class="nav-item">
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
-                        添加好友
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link text-light " id="logout">登出</a>
+                    <a class="nav-link dropdown-toggle p-0" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="{{asset(Auth::user()->photo)}}" class="rounded-circle mr-3" alt="" width="40px" height="40px">
+                        {{$name}}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <button class="dropdown-item py-3" type="button" data-toggle="modal"
+                            data-target="#createFriendModal">添加好友</button>
+                        <button class="dropdown-item py-3" type="button" data-toggle="modal"
+                            data-target="#editUserModal">編輯資訊</button>
+                        <button class="dropdown-item py-3" type="button" data-toggle="modal"
+                            data-target="#logoutModal">會員登出</button>
+                    </div>
                 </li>
             </ul>
         </div>
     </header>
     @include('friend.createFriendModal')
+    @include('friend.editUser')
+    @include('friend.logoutModal')
     @endif
 
     @yield('content')

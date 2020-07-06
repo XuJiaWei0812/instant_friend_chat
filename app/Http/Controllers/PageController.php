@@ -220,7 +220,6 @@ class PageController extends Controller
                 'title' => $friend->fu_name,
                 'name'=>auth('web')->user()->name,
                 'photo'=>auth('web')->user()->photo,
-                'id'=>auth('web')->user()->id,
                 'fu_name'=>$friend->fu_name,
                 'fu_photo'=>$friend->fu_photo,
                 'friendMessages' => $friendMessages,
