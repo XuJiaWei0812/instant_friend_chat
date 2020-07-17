@@ -21,13 +21,10 @@ class getReadyMessage implements ShouldBroadcast
      *
      * @return void
      */
-    public $message;
-    public $fid;
-    public function __construct($fid)
+    public $friend_id;
+    public function __construct($friend_id,$ready_message)
     {
-        $getReady =FriendMessage::select('id')->where('friend_id', $fid)->where('type', 1)->get();
-        $this->message =  $getReady;
-        $this->fid =  $fid;
+        $this->friend_id =  $friend_id;
     }
 
     /**

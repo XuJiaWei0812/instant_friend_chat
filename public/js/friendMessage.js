@@ -43,7 +43,7 @@ $(function () {
             cache: false,
             success: function (data) {
                 if ($.isEmptyObject(data.error)) {
-                    console.log("ok");
+                    console.log("圖片傳送成功");
                 } else {
                     alert(data.error);
                 }
@@ -63,7 +63,7 @@ $(function () {
             success: function (data) {
                 if ($.isEmptyObject(data.error)) {
                     $("#createFriendMessage")[0].reset();
-                    console.log("ok");
+                    console.log("文字傳送成功");
                 } else {
                     printErrorMsg(data.error);
                 }

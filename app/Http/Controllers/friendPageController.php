@@ -5,47 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use App\FriendMessage;
+use Illuminate\Support\Facades\Auth;
 use Cache;
 use Illuminate\Support\Facades\Artisan;
 
-class PageController extends Controller
+class friendPageController extends Controller
 {
-    public function loginPage()
+    public function getRosters()
     {
-        $binding = [
-            'title' => '登入會員',
-        ];
-        return view('login', $binding);
-    }
-    public function registerPage()
-    {
-        $binding = [
-            'title' => '註冊會員',
-        ];
-
-        return view('register', $binding);
-    }
-    public function resetPage()
-    {
-        $binding = [
-            'title' => '重設密碼',
-        ];
-
-        return view('reset', $binding);
-    }
-    public function friendRosterPage()
-    {
-        $friendRosters = DB::table('friends')
+        $rosters=DB::table('friends')
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'friends.inviter_user_id')
                     ->orOn('users.id', '=', 'friends.invitee_user_id');
             })
             ->select(
-                'friends.id as fid',
-                'users.id as fu_id',
-                'name as fu_name',
-                'email as fu_email',
-                'photo',
+                'friends.id as friend_id',
+                'users.id as friend_userId',
+                'name as friend_name',
+                'email as friend_email',
+                'photo as friend_photo',
                 DB::raw("IF(online=0,'下線中','上線中') as online"),
             )
             ->where('friends.type', '=', 1)
@@ -56,19 +34,22 @@ class PageController extends Controller
             })
             ->get();
 
+        return $rosters;
+    }
+    public function rosterPage()
+    {
         $binding = [
             'title' => '好友名單',
+            'id'=>auth('web')->user()->id,
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
-            'id'=>auth('web')->user()->id,
-            'friendRosters' => $friendRosters,
+            'rosters' => $this->getRosters(),
         ];
-
         return view('friend.friendList', $binding);
     }
-    public function friendRecordPage()
+    public function getRecords()
     {
-        $friendRecords = DB::table('friends')
+        $records= DB::table('friends')
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'friends.inviter_user_id')
                     ->orOn('users.id', '=', 'friends.invitee_user_id');
@@ -80,11 +61,11 @@ class PageController extends Controller
                 $join->on('friends_message.friend_id', '=', 'friends.id');
             })
             ->select(
-                'friends.id as fid',
-                'friends_message.user_id as fm_uid',
-                'users.id as uid',
-                'name',
-                'photo',
+                'friends.id as friend_id',
+                'users.id as friend_userId',
+                'name as friend_name',
+                'photo as friend_photo',
+                'friends_message.user_id as message_userId',
                 'message',
                 'unread',
                 DB::raw("DATE_FORMAT(maxtime,'%m-%d') as date"),
@@ -97,94 +78,90 @@ class PageController extends Controller
             })
             ->orderBy('maxtime', 'desc')
             ->get();
-
-        foreach ($friendRecords as &$friendRecord) {
-            if (strpos($friendRecord->message, 'images') !== false) {
-                if ($friendRecord->fm_uid==auth('web')->user()->id) {
-                    $friendRecord->message = "照片已傳送";
+        foreach ($records as &$record) {
+            if (strpos($record->message, 'images') !== false) {
+                if ($record->friend_userId==auth('web')->user()->id) {
+                    $record->message = "照片已傳送";
                 } else {
-                    $friendRecord->message = $friendRecord->name."傳送了照片";
+                    $record->message ="對方傳送了照片";
                 }
             } else {
-                $friendRecord->message=mb_substr(preg_replace('/<[^>]+>|&[^>]+;/', '', $friendRecord->message), 0, 12, 'utf8');
+                $record->message=mb_substr(preg_replace('/<[^>]+>|&[^>]+;/', '', $record->message), 0, 12, 'utf8');
             }
-            if (date("m-d")==$friendRecord->date) {
-                $friendRecord->date="";
-            } elseif (date("m-d", strtotime("-1 day"))==$friendRecord->date) {
-                $friendRecord->date="昨天";
+            if (date("m-d")==$record->date) {
+                $record->date="";
+            } elseif (date("m-d", strtotime("-1 day"))==$record->date) {
+                $record->date="昨天";
             } else {
-                $friendRecord->time="";
+                $record->time="";
             }
         }
-        unset($friendRecord);
-
+        unset($record);
+        return $records;
+    }
+    public function recordsPage()
+    {
         $binding = [
             'title' => '聊天紀錄',
+            'id'=>auth('web')->user()->id,
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
-            'id'=>auth('web')->user()->id,
-            'friendRecords' => $friendRecords,
+            'records' => $this->getRecords(),
         ];
-
         return view('friend.friendList', $binding);
     }
-    public function friendApplyPage()
+    public function getAppllys()
     {
-        $friendApplys = DB::table('friends')
+        $appllys=DB::table('friends')
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'friends.inviter_user_id')
                     ->orOn('users.id', '=', 'friends.invitee_user_id');
             })
-            ->select('friends.id as fid', 'users.id as fu_id', 'name as fu_name', 'email as fu_email')
+            ->select('friends.id as friend_id', 'users.id as friend_userId', 'name as friend_name', 'email as friend_email')
             ->where('invitee_user_id', auth('web')->user()->id)
             ->where('users.id', '!=', auth('web')->user()->id)
             ->where('friends.type', 0)
             ->get();
-
+        return  $appllys;
+    }
+    public function applysPage()
+    {
         $binding = [
             'title' => '申請審核',
+            'id'=>auth('web')->user()->id,
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
-            'id'=>auth('web')->user()->id,
-            'friendApplys' => $friendApplys,
+            'applys' => $this->getAppllys(),
         ];
 
         return view('friend.friendList', $binding);
     }
-    public function friendMessagePage($fid)
+    public function getFriendData($friend_id, $user_id)
     {
-        Artisan::call('view:clear');
-        //進入更改訊息讀取狀態，並使用getReadyMessage、getRecordMessage更改已讀未讀及聊天紀錄
-        FriendMessage::where('friend_id', $fid)
-        ->where('user_id', "!=", auth('web')->user()->id)
-        ->update(['type' => 1]);
-        event(new \App\Events\getReadyMessage($fid));
-        event(new \App\Events\getRecordMessage(auth('web')->user()->id));
-        //取得好友名稱、id、照片
         $friend = DB::table('friends')
             ->join('users', function ($join) {
                 $join->on('users.id', '=', 'friends.inviter_user_id')
                     ->orOn('users.id', '=', 'friends.invitee_user_id');
             })
-            ->select('users.id as fuid', 'users.name as fu_name', 'photo as fu_photo')
-            ->where('users.id', '!=', auth('web')->user()->id)
-            ->where('friends.id', $fid)
-            ->Where(function ($query) {
-                $query->where('inviter_user_id', auth('web')->user()->id)
-                    ->orWhere('invitee_user_id', auth('web')->user()->id);
+            ->select('users.id as friend_userId', 'users.name as friend_name', 'photo as friend_photo')
+            ->where('users.id', '!=', $user_id)
+            ->where('friends.id', $friend_id)
+            ->Where(function ($query) use($user_id){
+                $query->where('inviter_user_id', $user_id)
+                    ->orWhere('invitee_user_id', $user_id);
             })
             ->first();
-        if ($friend === null) {
-            return response('404 Not Found', 404);
-        } else {
-            //取得好友對話訊息
-            $friendMessages = DB::table('friends_message')
+        return $friend;
+    }
+    public function getMessages($friend_id)
+    {
+        $messages = DB::table('friends_message')
                 ->join('users', function ($join) {
                     $join->on('users.id', '=', 'friends_message.user_id');
                 })
                 ->select(
                     'friends_message.id',
-                    'users.id as uid',
+                    'users.id as user_id',
                     'name',
                     'photo',
                     'message',
@@ -197,32 +174,50 @@ class PageController extends Controller
                     DB::raw("IF(friends_message.type=1,'已讀',null) as ready"),
                     'friends_message.created_at',
                 )
-                ->where('friends_message.friend_id', $fid)
+                ->where('friends_message.friend_id', $friend_id)
                 ->orderBy('friends_message.created_at', 'asc')
                 ->get();
 
-            //整理訊息格式
-            $date = "";
-            foreach ($friendMessages as &$friendMessage) {
-                $friendMessage->photo = asset($friendMessage->photo);
-                if (strpos($friendMessage->message, 'images') !== false) {
-                    $friendMessage->message = asset($friendMessage->message);
-                }
-                if ($date != $friendMessage->date) {
-                    $date = $friendMessage->date;
-                } else {
-                    $friendMessage->date = null;
-                }
+        //整理訊息格式
+        $date = "";
+        foreach ($messages as &$message) {
+            $message->photo = asset($message->photo);
+            if (strpos($message->message, 'images') !== false) {
+                $message->message = asset($message->message);
             }
-            unset($friendMessage);
+            if ($date != $message->date) {
+                $date = $message->date;
+            } else {
+                $message->date = null;
+            }
+        }
+        unset($message);
+        return $messages;
+    }
+    public function getReadyMessages($friend_id, $user_id)
+    {
+        FriendMessage::where('friend_id', $friend_id)
+        ->where('user_id', "!=", $user_id)
+        ->update(['type' => 1]);
+    }
+    public function friendMessagePage($friend_id)
+    {
+        Artisan::call('view:clear');
+        //進入更改訊息讀取狀態，並使用getReadyMessage、getRecordMessage更改已讀未讀及聊天紀錄
+        event(new \App\Events\getReadyMessage($friend_id, $this->getReadyMessages($friend_id, auth('web')->user()->id)));
+        //取得好友名稱、id、照片
+        $friend = $this->getFriendData($friend_id, auth('web')->user()->id);
+        if ($friend === null) {
+            return response('404 Not Found', 404);
+        } else {
             //綑綁傳回blade的資料
             $binding = [
-                'title' => $friend->fu_name,
+                'title' => $friend->friend_name,
                 'name'=>auth('web')->user()->name,
                 'photo'=>auth('web')->user()->photo,
-                'fu_name'=>$friend->fu_name,
-                'fu_photo'=>$friend->fu_photo,
-                'friendMessages' => $friendMessages,
+                'friend_name'=>$friend->friend_name,
+                'friend_photo'=>$friend->friend_photo,
+                'messages' => $this->getMessages($friend_id),
             ];
             //帶著 $binding顯示friendMessage畫面
             return view('friend.friendMessage', $binding);

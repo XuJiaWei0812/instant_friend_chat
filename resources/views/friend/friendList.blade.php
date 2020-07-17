@@ -8,19 +8,19 @@
         <div class="col-lg-8 mx-auto px-0">
         <ul class="list-group" id="list-ul{{$id}}">
                 {{--好友名單start--}}
-                @if (!empty($friendRosters))
-                @foreach ($friendRosters as $friendRoster)
+                @if (!empty($rosters))
+                @foreach ($rosters as $roster)
                 <a href="#" class="list-group-item list-group-item-action" data-toggle="modal"
-                    data-target="#friendLsitModal{{$friendRoster->fid}}">
+                    data-target="#friendLsitModal{{$roster->friend_id}}">
                     <div class="d-flex w-100 justify-content-start align-items-center">
-                        <img src="{{asset($friendRoster->photo)}}" class="rounded-circle mr-3" alt="" width="40px"
+                        <img src="{{asset($roster->friend_photo)}}" class="rounded-circle mr-3" alt="" width="40px"
                             height="40px">
                         <h5 class="mb-1 align-items-center flex-grow-1">
-                            {{$friendRoster->fu_name}}
+                            {{$roster->friend_name}}
                         </h5>
-                        <span id="user{{$friendRoster->fu_id}}"
-                            class="badge {{$friendRoster->online == "上線中" ? "badge-success" : "badge-danger"}}">
-                            {{$friendRoster->online}}
+                        <span id="user{{$roster->friend_userId}}"
+                            class="badge {{$roster->online == "上線中" ? "badge-success" : "badge-danger"}}">
+                            {{$roster->online}}
                         </span>
                     </div>
                 </a>
@@ -28,26 +28,26 @@
                 @endforeach
                 {{--好友名單end--}}
                 {{--聊天紀錄start--}}
-                @elseif(!empty($friendRecords))
-                @foreach ($friendRecords as $friendRecord)
-                <a href="{{ asset('/friend/chat/'.$friendRecord->fid) }}"
+                @elseif(!empty($records))
+                @foreach ($records as $record)
+                <a href="{{ asset('/friend/chat/'.$record->friend_id) }}"
                     class="p-2 list-group-item list-group-item-action">
-                    <img src="{{ asset($friendRecord->photo) }}" class="rounded-circle mr-2 float-left" alt="無法顯示圖片"
+                    <img src="{{ asset($record->friend_photo) }}" class="rounded-circle mr-2 float-left" alt="無法顯示圖片"
                         width="62px" height="62px">
                     <div class="d-flex flex-column">
                         <div class="p-1 d-flex justify-content-between">
                             <h5 class="flex-grow-1">
-                                {{ $friendRecord->name }}
+                                {{ $record->friend_name }}
                             </h5>
-                            <span id="time{{$friendRecord->fid}}">
-                                {{ $friendRecord->date }} {{ $friendRecord->time }}
+                            <span id="time{{$record->friend_id}}">
+                                {{ $record->date }} {{ $record->time }}
                             </span>
                         </div>
-                        <div class="p-1 flex-fill" id="message-unread{{$friendRecord->fid}}">
-                            <span id="message{{$friendRecord->fid}}">{{ $friendRecord->message }}</span>
-                            @if ($friendRecord->unread>0)
-                            <span class="badge badge-primary badge-pill float-right" id="unread{{$friendRecord->fid}}">
-                                {{ $friendRecord->unread }}
+                        <div class="p-1 flex-fill" id="message-unread{{$record->friend_id}}">
+                            <span id="message{{$record->friend_id}}">{{ $record->message }}</span>
+                            @if ($record->unread>0)
+                            <span class="badge badge-primary badge-pill float-right" id="unread{{$record->friend_id}}">
+                                {{ $record->unread }}
                             </span>
                             @endif
                         </div>
@@ -56,15 +56,15 @@
                 @endforeach
                 {{--聊天紀錄end--}}
                 {{--好友審核start--}}
-                @elseif(!empty($friendApplys))
-                @foreach ($friendApplys as $friendApply)
+                @elseif(!empty($applys))
+                @foreach ($applys as $apply)
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <p class="h4 flex-grow-1">
-                        {{$friendApply->fu_name}}
+                        {{$apply->friend_name}}
                     </p>
                     <button type="button" class="btn btn-primary mr-1"
-                        onclick="agreeFriend({{$friendApply->fid}});">同意</button>
-                    <button type="button" onclick="refuseFriend({{$friendApply->fid}});"
+                        onclick="agreeFriend({{$apply->friend_id}});">同意</button>
+                    <button type="button" onclick="refuseFriend({{$apply->friend_id}});"
                         class="btn btn-danger mr-1">拒絕</button>
                 </div>
                 @endforeach

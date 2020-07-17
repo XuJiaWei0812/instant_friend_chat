@@ -21,36 +21,11 @@ class createFriendMessage implements ShouldBroadcast
      *
      * @return void
      */
-    public $message;
+    public $new_message;
 
-    public function __construct($fid, $uid, $input)
+    public function __construct($new_message)
     {
-        $input['friend_id']=$fid;
-        $input['user_id']=$uid;
-        $addMessage = FriendMessage::create($input);
-        $getMessage = DB::table('friends_message')
-            ->join('users', function ($join) {
-                $join->on('users.id', '=', 'friends_message.user_id');
-            })
-            ->select(
-                'friends_message.id',
-                'friends_message.friend_id',
-                'users.id as uid',
-                'name',
-                'photo',
-                'message',
-                DB::raw("DATE_FORMAT(friends_message.created_at,'%H:%i') as time"),
-            )
-            ->where('friends_message.id', $addMessage->id)
-            ->where('friend_id', $fid)
-            ->orderBy('time', 'desc')
-            ->first();
-
-        $getMessage->photo = asset($getMessage->photo);
-        if (strpos($getMessage->message, 'images') !== false) {
-            $getMessage->message = asset($getMessage->message);
-        }
-        $this->message =  $getMessage;
+        $this->new_message =  $new_message;
     }
 
     /**
