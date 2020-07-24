@@ -15,6 +15,6 @@ Route::group(['prefix' => 'friend'], function () {
     Route::post('/apply', 'FriendController@addApplyProcess');
     Route::put('/apply/{friend_id}', 'FriendController@agreeApplyProcess');
     Route::delete('/apply/{friend_id}', 'FriendController@refuseApplyProcess');
-    Route::post('/chat/{friend_id}', 'FriendController@addMessageProcess');//發送訊息
-    Route::put('/chat/{friend_id}', 'FriendController@checkReadyMessageProcess');//已讀訊
+    Route::post('/chat/{friend_id}', 'FriendController@addMessageProcess');
+    Route::put('/chat/{friend_id}', 'FriendController@checkReadyMessageProcess');
 });

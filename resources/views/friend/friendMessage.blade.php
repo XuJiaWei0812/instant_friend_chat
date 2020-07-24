@@ -84,5 +84,7 @@
 <script type="text/javascript" src="{{asset('js/friendMessage.js')}}"></script>
 <script src="{{mix('js/app.js')}}" type="text/javascript"></script>
 <script type="text/javascript">
+console.log($(window).scrollTop()+$(window).height())
+console.log($( document ).height())
 </script>
 @endsection

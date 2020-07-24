@@ -30,7 +30,12 @@
                     <a class="nav-link text-light" href="/friend/roster">好友名單</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-light" href="/friend/record">聊天紀錄</a>
+                    <a class="nav-link text-light" href="/friend/record">
+                        聊天紀錄
+                        @if ($unread)
+                            <i class="fas fa-bell"></i>
+                        @endif
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-light" href="/friend/apply">申請審核</a>
@@ -66,8 +71,6 @@
     <script type="text/javascript" src="{{asset('bootstrap/js/bootstrap.min.js')}}"></script>
     <script type="text/javascript">
         if (!!window.performance && window.performance.navigation.type === 2) {
-            //window.performance.navigation.type ===2 表示使用 back or forward
-            console.log('Reloading');
             window.location.reload();
         }
         $("input").mouseup(function () {

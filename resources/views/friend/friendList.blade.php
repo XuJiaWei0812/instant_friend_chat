@@ -6,7 +6,7 @@
 <section class="container-fluid px-0">
     <div class="row mx-auto">
         <div class="col-lg-8 mx-auto px-0">
-        <ul class="list-group" id="list-ul{{$id}}">
+            <ul class="list-group" id="list-ul{{$id}}">
                 {{--好友名單start--}}
                 @if (!empty($rosters))
                 @foreach ($rosters as $roster)
@@ -31,7 +31,7 @@
                 @elseif(!empty($records))
                 @foreach ($records as $record)
                 <a href="{{ asset('/friend/chat/'.$record->friend_id) }}"
-                    class="p-2 list-group-item list-group-item-action">
+                    class="p-2 list-group-item list-group-item-action" id="record{{$record->friend_id}}">
                     <img src="{{ asset($record->friend_photo) }}" class="rounded-circle mr-2 float-left" alt="無法顯示圖片"
                         width="62px" height="62px">
                     <div class="d-flex flex-column">
@@ -43,11 +43,14 @@
                                 {{ $record->date }} {{ $record->time }}
                             </span>
                         </div>
-                        <div class="p-1 flex-fill" id="message-unread{{$record->friend_id}}">
+                        <div class="p-1 flex-fill">
                             <span id="message{{$record->friend_id}}">{{ $record->message }}</span>
                             @if ($record->unread>0)
                             <span class="badge badge-primary badge-pill float-right" id="unread{{$record->friend_id}}">
                                 {{ $record->unread }}
+                            </span>
+                            @else
+                            <span class="badge badge-pill float-right" id="unread{{$record->friend_id}}">
                             </span>
                             @endif
                         </div>

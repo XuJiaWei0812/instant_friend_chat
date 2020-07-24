@@ -38,11 +38,18 @@ class friendPageController extends Controller
     }
     public function rosterPage()
     {
+        $unread=false;
+        foreach ($this->getRecords() as $record) {
+            if ($record->unread>0) {
+                $unread=true;
+            }
+        }
         $binding = [
             'title' => '好友名單',
             'id'=>auth('web')->user()->id,
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
+            'unread'=>$unread,
             'rosters' => $this->getRosters(),
         ];
         return view('friend.friendList', $binding);
@@ -101,11 +108,18 @@ class friendPageController extends Controller
     }
     public function recordsPage()
     {
+        $unread=false;
+        foreach ($this->getRecords() as $record) {
+            if ($record->unread>0) {
+                $unread=true;
+            }
+        }
         $binding = [
             'title' => '聊天紀錄',
             'id'=>auth('web')->user()->id,
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
+            'unread'=>$unread,
             'records' => $this->getRecords(),
         ];
         return view('friend.friendList', $binding);
@@ -126,11 +140,19 @@ class friendPageController extends Controller
     }
     public function applysPage()
     {
+        $unread=false;
+        foreach ($this->getRecords() as $record) {
+            if ($record->unread>0) {
+                $unread=true;
+            }
+        }
+
         $binding = [
             'title' => '申請審核',
             'id'=>auth('web')->user()->id,
             'name'=>auth('web')->user()->name,
             'photo'=>auth('web')->user()->photo,
+            'unread'=>$unread,
             'applys' => $this->getAppllys(),
         ];
 
@@ -146,7 +168,7 @@ class friendPageController extends Controller
             ->select('users.id as friend_userId', 'users.name as friend_name', 'photo as friend_photo')
             ->where('users.id', '!=', $user_id)
             ->where('friends.id', $friend_id)
-            ->Where(function ($query) use($user_id){
+            ->Where(function ($query) use ($user_id) {
                 $query->where('inviter_user_id', $user_id)
                     ->orWhere('invitee_user_id', $user_id);
             })
@@ -210,6 +232,12 @@ class friendPageController extends Controller
         if ($friend === null) {
             return response('404 Not Found', 404);
         } else {
+            $unread=false;
+            foreach ($this->getRecords() as $record) {
+                if ($record->unread>0) {
+                    $unread=true;
+                }
+            }
             //綑綁傳回blade的資料
             $binding = [
                 'title' => $friend->friend_name,
@@ -217,6 +245,7 @@ class friendPageController extends Controller
                 'photo'=>auth('web')->user()->photo,
                 'friend_name'=>$friend->friend_name,
                 'friend_photo'=>$friend->friend_photo,
+                'unread'=>$unread,
                 'messages' => $this->getMessages($friend_id),
             ];
             //帶著 $binding顯示friendMessage畫面

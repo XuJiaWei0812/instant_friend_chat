@@ -7,7 +7,7 @@ use Validator;
 use DB;
 use Image;
 use Illuminate\Support\Facades\Auth;
-use App\user;
+use App\User;
 use App\Friend;
 use App\FriendMessage;
 use Session;
@@ -149,7 +149,7 @@ class FriendController extends Controller
         $ready_message =FriendMessage::select('id')->where('friend_id', $friend_id)->where('type', 1)->where('id', $message_id)->get();
         return $ready_message;
     }
-    public function getRecords($friend_userId)
+    public function getRecords($friend_userId,$friend_id)
     {
         $records= DB::table('friends')
             ->join('users', function ($join) {
@@ -175,6 +175,7 @@ class FriendController extends Controller
                 DB::raw("DATE_FORMAT(maxtime,'%H:%i') as time"),
             )
             ->where('users.id', '<>', $friend_userId)
+            ->where('friends.id', $friend_id)
             ->Where(function ($query) use ($friend_userId) {
                 $query->where('inviter_user_id', $friend_userId)
                     ->orWhere('invitee_user_id', $friend_userId);
@@ -208,8 +209,10 @@ class FriendController extends Controller
         $friendr_ready = FriendMessage::where('friend_id', $friend_id)
             ->where('user_id', '!=', auth('api')->user()->id)
             ->update(['type' => 1]);
-        event(new \App\Events\getReadyMessage($friend_id, $this->getReadys($friend_id, $request['message_id'], auth('api')->user()->id)));
-        event(new \App\Events\getRecordMessage($request['friend_userId'], $this->getRecords($request['friend_userId'])));
+        if (auth('api')->user()->id!== (int)$request['message_userId']) {
+            event(new \App\Events\getReadyMessage($friend_id, $this->getReadys($friend_id, $request['message_id'], auth('api')->user()->id)));
+        }
+        event(new \App\Events\getRecordMessage($request['friend_userId'], $this->getRecords($request['friend_userId'],$request['friend_id'])));
         return response()->json(['success' => '確認訊息功能通過']);
     }
 }

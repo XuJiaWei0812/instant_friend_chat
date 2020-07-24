@@ -7,8 +7,7 @@ $.ajaxSetup({
 });
 $(function () {
     $("html,body").animate({
-        //把畫面置底
-        scrollTop: $(window).height() + 9999
+        scrollTop: $(document).height()
     });
     $("#logout").click(function (event) {
         event.preventDefault();
